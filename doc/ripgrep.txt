@@ -1,0 +1,97 @@
+*ripgrep.txt*                     Plugin for ripgrep, fast alternative of grep
+
+==============================================================================
+CONTENTS                                                             *ripgrep*
+
+1. Introduction                                         |ripgrep-introduction|
+2. Commands                                                 |ripgrep-commands|
+3. Settings                                                 |ripgrep-settings|
+
+==============================================================================
+INTRODUCTION                                            *ripgrep-introduction*
+
+This plugin is for integration with "ripgrep" (or "rg"), a fast alternative of
+"grep" command.
+
+==============================================================================
+COMMANDS                                                    *ripgrep-commands*
+
+                                                                         *:Rg*
+:Rg[!] [pattern]
+		Run |g:rg_command| with the given [pattern]. If [pattern] is
+		absent, |<cword>| is passed to instead.
+
+		If |g:rg_jump_to_first| is false (by default), ":Rg" executes
+		":grep!", staying here, and ":Rg!" executes ":grep", jumping
+		to the first match.
+		If |g:rg_jump_to_first| is true, ":Rg" executes ":grep",
+		staying here, and ":Rg!" executes ":grep!", jumping to the
+		first match. In this case, [!] flag you pass to :Rg is passed
+		through to the internal :grep call as it is.
+
+                                                                     *:RgRoot*
+:RgRoot
+		Show the root directory "rg" searches.
+
+==============================================================================
+SETTINGS                                                    *ripgrep-settings*
+
+                                                                 *g:rg_binary*
+g:rg_binary~
+	Path to "rg" command. (default: "rg")
+>
+		let g:rg_binary = 'rg'
+<
+
+                                                                 *g:rg_format*
+g:rg_format~
+	Value of 'grepformat'. (default: "%f:%l:%c:%m")
+>
+		let g:rg_format = '%f:%l:%c:%m'
+<
+
+                                                                *g:rg_command*
+g:rg_command~
+	Command line (default: |g:rg_binary| . ' --vimgrep')
+>
+		let g:rg_command = g:rg_binary . ' --vimgrep'
+<
+
+                                                              *g:rg_highlight*
+g:rg_highlight~
+	True if you want matches highlighted. (default: 0, false)
+>
+		let g:rg_highlight = 0
+<
+
+                                                            *g:rg_derive_root*
+g:rg_derive_root~
+	True if you want to find project root from the current working
+	directory. (default: 0, false)
+>
+		let g:rg_derive_root = 0
+<
+
+                                                             *g:rg_root_types*
+g:rg_root_types~
+	List of files or directories found in project root.
+	(default: ['.git'])
+>
+		let g:rg_root_types = ['.git']
+<
+
+                                                        *g:rg_window_location*
+g:rg_window_location~
+	|QuickFix| window location. (default: "botright")
+>
+		let g:rg_window_location = 'botright'
+<
+
+                                                          *g:rg_jump_to_first*
+g:rg_jump_to_first~
+	True if you want to jump to the first match. (default: 0, false)
+>
+		let g:rg_jump_to_first = 0
+<
+==============================================================================
+ vim:ft=help:tw=78:noet:ts=8:norl:
