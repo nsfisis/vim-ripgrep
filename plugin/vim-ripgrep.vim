@@ -24,12 +24,19 @@ if !exists('g:rg_window_location')
   let g:rg_window_location = 'botright'
 endif
 
+if !exists('g:rg_jump_to_first')
+  let g:rg_jump_to_first = 0
+endif
+
 fun! g:RgVisual() range
-  call s:RgGrepContext(function('s:RgSearch'), '"' . s:RgGetVisualSelection() . '"')
+  call s:RgGrepContext(function('s:RgSearch'), '!', '"' . s:RgGetVisualSelection() . '"')
 endfun
 
-fun! s:Rg(txt)
-  call s:RgGrepContext(function('s:RgSearch'), s:RgSearchTerm(a:txt))
+fun! s:Rg(bang, txt)
+  if !g:rg_jump_to_first
+    let a:bang = !a:bang
+  endif
+  call s:RgGrepContext(function('s:RgSearch'), a:bang ? '!' : '', s:RgSearchTerm(a:txt))
 endfun
 
 fun! s:RgGetVisualSelection()
@@ -53,7 +60,7 @@ fun! s:RgSearchTerm(txt)
   endif
 endfun
 
-fun! s:RgSearch(txt)
+fun! s:RgSearch(bang, txt)
   let l:rgopts = ' '
   if &ignorecase == 1
     let l:rgopts = l:rgopts . '-i '
@@ -61,7 +68,7 @@ fun! s:RgSearch(txt)
   if &smartcase == 1
     let l:rgopts = l:rgopts . '-S '
   endif
-  silent! exe 'grep! ' . l:rgopts . a:txt
+  silent! exe 'grep' . a:bang . ' ' . l:rgopts . a:txt
   if len(getqflist())
     exe g:rg_window_location 'copen'
     redraw!
@@ -75,7 +82,7 @@ fun! s:RgSearch(txt)
   endif
 endfun
 
-fun! s:RgGrepContext(search, txt)
+fun! s:RgGrepContext(search, bang, txt)
   let l:grepprgb = &grepprg
   let l:grepformatb = &grepformat
   let &grepprg = g:rg_command
@@ -90,9 +97,9 @@ fun! s:RgGrepContext(search, txt)
   endif
 
   if exists('g:rg_derive_root')
-    call s:RgPathContext(a:search, a:txt)
+    call s:RgPathContext(a:search, a:bang, a:txt)
   else
-    call a:search(a:txt)
+    call a:search(a:bang, a:txt)
   endif
 
   let &shellpipe=l:shellpipe_bak
@@ -102,10 +109,10 @@ fun! s:RgGrepContext(search, txt)
   let &grepformat = l:grepformatb
 endfun
 
-fun! s:RgPathContext(search, txt)
+fun! s:RgPathContext(search, bang, txt)
   let l:cwdb = getcwd()
   exe 'lcd '.s:RgRootDir()
-  call a:search(a:txt)
+  call a:search(a:bang, a:txt)
   exe 'lcd '.l:cwdb
 endfun
 
@@ -145,5 +152,5 @@ fun! s:RgShowRoot()
   endif
 endfun
 
-command! -nargs=* -complete=file Rg :call s:Rg(<q-args>)
+command! -bang -nargs=* -complete=file Rg :call s:Rg(<bang>0, <q-args>)
 command! -complete=file RgRoot :call s:RgShowRoot()
